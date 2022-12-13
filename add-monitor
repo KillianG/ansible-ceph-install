@@ -1,0 +1,21 @@
+---
+- name: Apply Ceph configuration
+  hosts: localhost
+  vars:
+    host-to-add-monitor: serverf.lab.example.com
+  tasks:
+    - name: create mon spec
+      ansible.builtin.copy:
+        dest: /tmp/mon_spec
+        content: | 
+          service_type: mon
+          placement:
+          hosts:
+            - "{{ host-to-add-monitor }}""
+    - name: apply spec
+      ansible.builtin.shell:
+        cmd: ceph orch apply -i /tmp/mon_spec
+    - name: Delete content & directory
+      file:
+        state: absent
+        path: /tmp/mon_spec

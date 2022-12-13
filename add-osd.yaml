@@ -1,0 +1,28 @@
+# code: language=ansible
+---
+- name: Apply Ceph configuration
+  hosts: localhost
+  vars:
+    hosts_to_add_osds:
+      - serverc.lab.example.com
+      - serverd.lab.example.com
+      - servere.lab.example.com
+  tasks:
+    - name: create osd spec
+      ansible.builtin.copy:
+        dest: /tmp/osd_spec
+        content: | 
+          service_type: osd
+          service_id: osd
+          placement:
+            hosts: {{ hosts_to_add_osds }}
+          spec:
+            data_devices:
+              all: true
+    - name: apply spec
+      ansible.builtin.shell:
+        cmd: ceph orch apply -i /tmp/osd_spec
+    - name: Delete content & directory
+      file:
+        state: absent
+        path: /tmp/osd_spec

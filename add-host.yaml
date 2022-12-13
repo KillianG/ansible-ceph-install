@@ -1,0 +1,20 @@
+---
+- name: add additional hosts to the cluster
+  hosts: localhost
+  become: true
+  vars:
+    hostname: "serverf.lab.example.com"
+    host_address: "172.25.250.15"
+    labels: ""
+  gather_facts: true
+  tasks:
+    - name: add hosts to the cluster
+      ceph_orch_host:
+        name: "{{ hostname }}"
+        address: "{{ host_address }}"
+        labels: "{{ labels }}"
+
+    - name: Add ssh key to the new host
+      ansible.builtin.shell:
+        cmd: "ceph cephadm get-pub-key > /tmp/ceph.pub && ssh-copy-id -f -i /tmp/ceph.pub root@{{ host_address }}"
+      register: host_list
