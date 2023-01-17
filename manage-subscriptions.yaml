@@ -1,0 +1,20 @@
+---
+- name: Register system, enable repo and install cephadm-ansible RPMs
+  hosts: all
+  become: yes
+  tasks:
+  - name: Register system
+    redhat_subscription:
+      state: present
+      username: "{{ redhat_username }}"
+      password: "{{ redhat_password }}"
+      pool_id: "{{ redhat_pool_id }}"
+  - name: Enable specific repository
+    yum_repository:
+      name: "{{ repo_name }}"
+      state: present
+      enabled: yes
+  - name: Install cephadm-ansible RPMs
+    yum:
+      name: cephadm-ansible
+      state: present

@@ -1,0 +1,9 @@
+- name: Configure dns
+  hosts: all
+  become: true
+  tasks:
+  - name: Update dns
+      lineinfile:
+      path: /etc/resolv.conf
+      state: present
+      line: 'nameserver 10.244.10.12\nnameserver 10.244.10.13'

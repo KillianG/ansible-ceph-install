@@ -1,0 +1,98 @@
+---
+- name: Create network bond and VLAN
+  hosts: all
+  vars:
+    ipv4_address_395: "192.168.104.2/24"
+    ipv4_address_396: "192.168.104.132/24"
+    ipv4_address_390: "172.21.0.62/23"
+    ipv4_gateway_390: "172.21.1.254"
+  tasks:
+  - name: Create network bond
+    nmcli:
+      command: connection
+      type: bond
+      con_name: bond0
+      ifname: bond0
+      autoconnect: yes
+      bond_mode: 802.3ad
+      ipv4:
+        method: disabled
+      ipv6:
+        method: ignore
+
+  - name: Create the slave
+    nmcli:
+      command: connection
+      type: ethernet
+      con_name: ens2f0np0
+      ifname: ens2f0np0
+      master: bond0
+
+  - name: Create the second slave
+    nmcli:
+      command: connection
+      type: ethernet
+      con_name: eno1
+      ifname: eno1
+      master: bond0
+
+  - name: Create VLAN 395
+    nmcli:
+      command: connection
+      type: vlan
+      con_name: bond0.395
+      ifname: bond0.395
+      dev: bond0
+      id: 395
+      autoconnect: yes
+      ipv4:
+        address: "{{ ipv4_address_395 }}"
+
+  - name: Create VLAN 396
+    nmcli:
+      command: connection
+      type: vlan
+      con_name: bond0.396
+      ifname: bond0.396
+      dev: bond0
+      id: 396
+      autoconnect: yes
+      ipv4:
+        address: "{{ ipv4_address_396 }}"
+
+  - name: Create VLAN 390
+    nmcli:
+      command: connection
+      type: vlan
+      con_name: bond0.390
+      ifname: bond0.390
+      dev: bond0
+      id: 390
+      autoconnect: yes
+      ipv4:
+        address: "{{ ipv4_address_390 }}"
+        gateway: "{{ ipv4_gateway_390 }}"
+
+  - name: Up bond0
+    nmcli:
+      command: connection
+      up: yes
+      con_name: bond0
+
+  - name: Up VLAN
+    nmcli:
+      command: connection
+      up: yes
+      con_name: bond0.395
+
+  - name: Up VLAN
+    nmcli:
+      command: connection
+      up: yes
+      con_name: bond0.396
+
+  - name: Up VLAN
+    nmcli:
+      command: connection
+      up: yes
+      con_name: bond0.390

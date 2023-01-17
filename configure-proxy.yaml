@@ -1,0 +1,15 @@
+- name: Configure http proxys
+  hosts: all
+  become: true
+  tasks:
+  - name: Update http proxy
+    lineinfile:
+      path: /etc/profile.d/http_proxy.sh
+      state: present
+      line: 'export http_proxy=http://proxysquid.brgm.fr'
+ 
+  - name: Update https proxy
+    lineinfile:
+      path: /etc/profile.d/https_proxy.sh
+      state: present
+      line: 'export https_proxy=https://proxysquid.brgm.fr'
